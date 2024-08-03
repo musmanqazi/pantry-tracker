@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { useState, useEffect } from 'react';
 import { firestore } from '@/firebase';
-import { Box, Typography } from "@mui/material";
+import { Box, Button, Modal, Stack, TextField, Typography } from "@mui/material";
 import { collection, getDocs, query } from "firebase/firestore";
 
 export default function Home() {
@@ -56,24 +56,60 @@ export default function Home() {
     updatePantry()
   }, [])
 
-  const handleOpen = () => setOpen(true) // Model helper function
-  const handleClose = () => setOpen(false) // Model helper function
+  const handleOpen = () => setOpen(true) // Modal helper function
+  const handleClose = () => setOpen(false) // Modal helper function
 
   return (
   // Box is the most basic Material UI Component
-  <Box>
+  <Box
+    width="100vw"
+    height="100vh"
+    display="flex"
+    justifyContent="center"
+    alignItems="center"
+    gap={2}
+    >
+    <Modal open={open} onClose={handleClose}>
+      <Box
+        position="absolute"
+        top="50%"
+        left="50%"
+        width={400}
+        bgcolor="white"
+        border="2px solid #00000"
+        boxShadow={24}
+        p={4}
+        display="flex"
+        flexDirection="column"
+        gap={3}
+        sx={{
+          transform: "translate(-50%, -50%)"
+        }}
+      >
+        <Typography variant="h6">Add Item</Typography>
+        <Stack width="100%" direction="row" spacing={2}>
+          <TextField
+            variant="outlined"
+            fullWidth
+            value={itemName}
+            onChange={(e) => {
+              setItemName(e.target.value)
+            }}
+          />
+          <Button 
+            variant="outlined"
+            onClick={() => {
+              addItem(itemName)
+              setItemName('')
+              handleClose()
+            }}
+          >
+            Add
+          </Button>
+        </Stack>
+      </Box>
+    </Modal>
     <Typography variant="h1">Pantry Tracker</Typography>
-    {
-      pantry.forEach((item) => {
-        console.log(item)
-        return (
-        <>
-        {item.name}
-        {item.count}
-        </>
-        )
-      })
-    }
   </Box>
   )
 }
