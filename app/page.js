@@ -58,6 +58,20 @@ export default function Home() {
     updatePantry()
   }, [])
 
+  const highlightText = (text, query) => {
+    if (!query) return text;
+    const parts = text.split(new RegExp(`(${query})`, 'gi'));
+    return parts.map((part, index) =>
+      part.toLowerCase() === query.toLowerCase() ? (
+        <span key={index} style={{ backgroundColor: 'yellow' }}>
+          {part}
+        </span>
+      ) : (
+        part
+      )
+    );
+  };
+
   const filteredPantry = pantry.filter(item =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -159,25 +173,25 @@ export default function Home() {
           Pantry Items
         </Typography>
         <Box display="flex" width="100%" justifyContent="space-between" paddingX={2} gap={2}>
-            <TextField
-              label="Search"
-              variant="outlined"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ flex: 2 }}
-            />
-            <FormControl variant="outlined" style={{ flex: 1 }}>
-              <InputLabel>Sort By</InputLabel>
-              <Select
-                value={sortOrder}
-                onChange={(e) => setSortOrder(e.target.value)}
-                label="Sort By"
-              >
-                <MenuItem value="name">Name</MenuItem>
-                <MenuItem value="quantity">Quantity</MenuItem>
-              </Select>
-            </FormControl>
-          </Box>
+          <TextField
+            label="Search"
+            variant="outlined"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ flex: 2 }}
+          />
+          <FormControl variant="outlined" style={{ flex: 1 }}>
+            <InputLabel>Sort By</InputLabel>
+            <Select
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+              label="Sort By"
+            >
+              <MenuItem value="name">Name</MenuItem>
+              <MenuItem value="quantity">Quantity</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
       </Box>
       <Stack width="800px" height="300px" overflow="auto">
           {sortedPantry.map(({ name, quantity }) => (
@@ -193,7 +207,7 @@ export default function Home() {
             >
               <Box flex={1} display="flex">
                 <Typography variant="h4" color="#333">
-                  {name.charAt(0).toUpperCase() + name.slice(1)}
+                  {highlightText(name.charAt(0).toUpperCase() + name.slice(1), searchQuery)}
                 </Typography>
               </Box>
               <Box flex={1} display="flex" justifyContent="center">
