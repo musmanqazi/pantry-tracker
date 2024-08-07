@@ -2,13 +2,15 @@
 import Image from "next/image";
 import { useState, useEffect } from 'react';
 import { firestore } from '@/firebase';
-import { Box, Button, Modal, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Modal, Stack, TextField, Typography, MenuItem, Select, FormControl, InputLabel } from "@mui/material";
 import { collection, getDocs, query, doc, getDoc, setDoc, deleteDoc } from "firebase/firestore";
 
 export default function Home() {
   const [pantry, setPantry] = useState([]) // Will store the inventory here
   const [open, setOpen] = useState(false) // Will use to add and remove items
   const [itemName, setItemName] = useState('') // Will use to store the name of the item
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortOrder, setSortOrder] = useState('');
 
   const updatePantry = async () => { // Helper function 1 
     const snapshot = query(collection(firestore, 'pantry'))
@@ -55,6 +57,19 @@ export default function Home() {
   useEffect(() => {
     updatePantry()
   }, [])
+
+  const filteredPantry = pantry.filter(item =>
+    item.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const sortedPantry = filteredPantry.sort((a, b) => {
+    if (sortOrder === 'name') {
+      return a.name.localeCompare(b.name);
+    } else if (sortOrder === 'quantity') {
+      return b.quantity - a.quantity;
+    }
+    return 0;
+  });
 
   const handleOpen = () => setOpen(true) // Modal helper function
   const handleClose = () => setOpen(false) // Modal helper function
@@ -130,11 +145,12 @@ export default function Home() {
     <Box border="1px solid #333">
       <Box
         width="800px"
-        height="100px"
+        height="200px"
         bgcolor="#ADD8E6"
         display="flex"
         alignItems="center"
-        justifyContent="center"
+        justifyContent="space-around"
+        flexDirection="column"
       >
         <Typography
           variant="h2"
@@ -142,23 +158,39 @@ export default function Home() {
         >
           Pantry Items
         </Typography>
+        <Box display="flex" width="100%" justifyContent="space-between" paddingX={2} gap={2}>
+            <TextField
+              label="Search"
+              variant="outlined"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ flex: 2 }}
+            />
+            <FormControl variant="outlined" style={{ flex: 1 }}>
+              <InputLabel>Sort By</InputLabel>
+              <Select
+                value={sortOrder}
+                onChange={(e) => setSortOrder(e.target.value)}
+                label="Sort By"
+              >
+                <MenuItem value="name">Name</MenuItem>
+                <MenuItem value="quantity">Quantity</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
       </Box>
-      <Stack
-        width="800px"
-        height="300px"
-        overflow="auto"
-      >
-        {
-          pantry.map(({name, quantity}) => (
-            <Box key={name} 
-              width="100%" 
-              minHeight="150px" 
-              display="flex" 
-              alignItems="center" 
-              justifyContent="space-between" 
+      <Stack width="800px" height="300px" overflow="auto">
+          {sortedPantry.map(({ name, quantity }) => (
+            <Box
+              key={name}
+              width="100%"
+              minHeight="150px"
+              display="flex"
+              alignItems="center"
+              justifyContent="space-between"
               bgcolor="#f0f0f0"
               padding={5}
-              >
+            >
               <Box flex={1} display="flex">
                 <Typography variant="h4" color="#333">
                   {name.charAt(0).toUpperCase() + name.slice(1)}
@@ -171,23 +203,17 @@ export default function Home() {
               </Box>
               <Box flex={1} display="flex" justifyContent="center">
                 <Stack direction="row" spacing={2}>
-                  <Button
-                    variant="contained"
-                    onClick={() => addItem(name)}
-                  >
+                  <Button variant="contained" onClick={() => addItem(name)}>
                     Add
                   </Button>
-                  <Button
-                    variant="contained"
-                    onClick={() => removeItem(name)}
-                  >
+                  <Button variant="contained" onClick={() => removeItem(name)}>
                     Remove
                   </Button>
                 </Stack>
               </Box>
             </Box>
           ))}
-      </Stack>
+        </Stack>
     </Box>
   </Box>
   )
