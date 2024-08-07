@@ -2,7 +2,10 @@
 import Image from "next/image";
 import { useState, useEffect } from 'react';
 import { firestore } from '@/firebase';
-import { Box, Button, Modal, Stack, TextField, Typography, MenuItem, Select, FormControl, InputLabel } from "@mui/material";
+import { Box, Button, Modal, Stack, TextField, Typography, MenuItem, Select, FormControl, InputLabel, IconButton } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
 import { collection, getDocs, query, doc, getDoc, setDoc, deleteDoc } from "firebase/firestore";
 
 export default function Home() {
@@ -51,6 +54,12 @@ export default function Home() {
         await setDoc(docRef, {quantity: quantity - 1})
       }
     }
+    await updatePantry()
+  }
+
+  const deleteItem = async (item) => { // Function to delete the entire item
+    const docRef = doc(collection(firestore, 'pantry'), item)
+    await deleteDoc(docRef)
     await updatePantry()
   }
 
@@ -223,6 +232,9 @@ export default function Home() {
                   <Button variant="contained" onClick={() => removeItem(name)}>
                     Remove
                   </Button>
+                  <IconButton aria-label="delete" onClick={() => deleteItem(name)}>
+                    <DeleteIcon />
+                  </IconButton>
                 </Stack>
               </Box>
             </Box>
