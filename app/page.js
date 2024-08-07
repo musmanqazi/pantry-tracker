@@ -214,28 +214,31 @@ export default function Home() {
               bgcolor="#f0f0f0"
               padding={5}
             >
-              <Box flex={1} display="flex">
+              <Box flex={7} display="flex">
                 <Typography variant="h4" color="#333">
                   {highlightText(name.charAt(0).toUpperCase() + name.slice(1), searchQuery)}
                 </Typography>
               </Box>
-              <Box flex={1} display="flex" justifyContent="center">
-                <Typography variant="h4" color="#333">
-                  {quantity}
-                </Typography>
-              </Box>
-              <Box flex={1} display="flex" justifyContent="center">
-                <Stack direction="row" spacing={2}>
-                  <Button variant="contained" onClick={() => addItem(name)}>
-                    Add
-                  </Button>
-                  <Button variant="contained" onClick={() => removeItem(name)}>
-                    Remove
-                  </Button>
-                  <IconButton aria-label="delete" onClick={() => deleteItem(name)}>
-                    <DeleteIcon />
+              <Box flex={10} display="flex" justifyContent="center">
+                <Stack direction="row" alignItems="center" spacing={2}>
+                  <IconButton aria-label="decrease" onClick={() => removeItem(name)}>
+                    <RemoveIcon />
+                  </IconButton>
+                  <TextField
+                    variant="outlined"
+                    value={quantity}
+                    inputProps={{ readOnly: true, style: { textAlign: 'center' } }}
+                    style={{ width: '60px' }}
+                  />
+                  <IconButton aria-label="increase" onClick={() => addItem(name)}>
+                    <AddIcon />
                   </IconButton>
                 </Stack>
+              </Box>
+              <Box flex={1} display="flex" justifyContent="center">
+                <IconButton aria-label="delete" onClick={() => deleteItem(name)}>
+                  <DeleteIcon />
+                </IconButton>
               </Box>
             </Box>
           ))}
